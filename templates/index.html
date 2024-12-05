@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация заявки{% endblock %}
+
+{% block content %}
+<h1>Регистрация заявки</h1>
+<form method="post">
+    <div class="form-group">
+        <label for="name">Ваше имя</label>
+        <input type="text" class="form-control" id="name" name="name" placeholder="Введите Ваше имя" required>
+    </div>
+    <div class="form-group">
+        <label for="description">Описание проблемы</label>
+        <textarea class="form-control" id="description" name="description" rows="5" placeholder="Опишите Вашу проблему" required></textarea>
+    </div>
+    <div class="form-group">
+        <label for="email">Почта</label>
+        <input type="ema" class="form-control" id="email" name="email" placeholder="Ваш email" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Отправить заявку</button>
+</form>
+{% endblock %}
