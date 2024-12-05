@@ -3,6 +3,30 @@
 {% block title %}Регистрация заявки{% endblock %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>
+<style>
+    body{
+  background: #0a0a23;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#fff;
+}
+
+select{
+  border:none;
+  padding: 10px 20px;
+  border-radius:5px;
+}
+
+select:focus{
+  outline:none;
+}
+    </style>
 <h1>Регистрация заявки</h1>
 <form method="post">
     <div class="form-group">
@@ -17,6 +41,13 @@
         <label for="email">Почта</label>
         <input type="ema" class="form-control" id="email" name="email" placeholder="Ваш email" required>
     </div>
+        <label for="language">Выберите тип заявление:</label>
+<select name="language" id="language">
+  <option value="javascript">Ошибка</option>
+  <option value="python">Поддержка</option>
+  <option value="c++" selected>Еще чета</option>
+  <option value="java" selected>Огород</option>
+</select>
     <button type="submit" class="btn btn-primary">Отправить заявку</button>
 </form>
 {% endblock %}
