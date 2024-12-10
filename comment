@@ -1,0 +1,30 @@
+from flask import Flask, render_template, request, redirect, url_for
+from models import db, Request, Comment
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///requests.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
+
+@app.route('/')
+def index():
+    # Отображаем список всех заявок
+    requests = Request.query.all()
+    return render_template('index.html', requests=requests)
+
+@app.route('/request/<int:request_id>', methods=['GET', 'POST'])
+def view_request(request_id):
+    # Страница для отображения заявки и комментариев к ней
+    request_item = Request.query.get_or_404(request_id)
+    if request.method == 'POST':
+        # Добавление нового комментария
+        comment_text = request.form['comment']
+        comment = Comment(text=comment_text, request_id=request_id)
+        db.session.add(comment)
+        db.session.commit()
+        return redirect(url_for('view_request', request_id=request_id))
+    comments = Comment.query.filter_by(request_id=request_id).all()
+    return render_template('view_request.html', request=request_item, comments=comments)
+
+if __name__ == '__main__':
+    app.run(debug=True)
