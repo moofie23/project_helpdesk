@@ -1,0 +1,36 @@
+@app.route('/')
+def index():
+    # Получаем все заявки
+    requests = Request.query.all()
+    return render_template('index.html', requests=requests)
+
+@app.route('/history', methods=['GET', 'POST'])
+def history():
+    # Фильтрация заявок по статусу и дате
+    status_filter = request.args.get('status')
+    date_filter = request.args.get('date')
+
+    query = Request.query
+
+    # Фильтрация по статусу
+    if status_filter:
+        query = query.filter_by(status=status_filter)
+
+    # Фильтрация по дате (например, за последний месяц)
+    if date_filter:
+        # Если выбрана дата, фильтруем заявки по дате
+        date_obj = datetime.strptime(date_filter, '%Y-%m-%d')
+        query = query.filter(Request.date >= date_obj)
+
+    requests = query.all()
+    return render_template('index.html', requests=requests)
+
+@app.route('/request/<int:request_id>')
+def view_request(request_id):
+    # Просмотр подробной информации о заявке
+    request_item = Request.query.get_or_404(request_id)
+    comments = Comment.query.filter_by(request_id=request_id).all()
+    return render_template('view_request.html', request=request_item, comments=comments)
+
+if __name__ == '__main__':
+    app.run(debug=True)
