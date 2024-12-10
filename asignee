@@ -1,0 +1,37 @@
+from flask import Flask, render_template, request, redirect, url_for
+from models import db, Request, Comment, User
+from datetime import datetime
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///requests.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'your_secret_key'  # Для работы с flash сообщениями
+
+db.init_app(app)
+
+@app.route('/')
+def index():
+    # Получаем все заявки
+    requests = Request.query.all()
+    return render_template('index.html', requests=requests)
+
+@app.route('/request/<int:request_id>', methods=['GET', 'POST'])
+def view_request(request_id):
+    # Просмотр подробной информации о заявке
+    request_item = Request.query.get_or_404(request_id)
+    comments = Comment.query.filter_by(request_id=request_id).all()
+
+    if request.method == 'POST':
+        # Назначение исполнителя
+        assignee_id = request.form['assignee']
+        request_item.assignee_id = assignee_id
+        db.session.commit()
+
+        return redirect(url_for('view_request', request_id=request_id))
+
+    # Получаем список всех пользователей для выбора исполнителя
+    users = User.query.all()
+    return render_template('view_request.html', request=request_item, comments=comments, users=users)
+
+if __name__ == '__main__':
+    app.run(debug=True)
