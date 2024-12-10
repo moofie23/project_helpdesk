@@ -1,0 +1,30 @@
+from flask import Flask, render_template, request
+from models import db, Visit
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///visits.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.secret_key = 'your_secret_key'  # Для работы с flash сообщениями
+
+db.init_app(app)
+
+@app.route('/')
+def index():
+    # Сбор статистики для главной страницы
+    ip_address = request.remote_addr
+    user_agent = request.headers.get('User-Agent')
+    url = request.url
+    new_visit = Visit(ip_address=ip_address, user_agent=user_agent, url=url)
+    db.session.add(new_visit)
+    db.session.commit()
+
+    return render_template('index.html')
+
+@app.route('/statistics')
+def statistics():
+    # Просмотр статистики
+    visits = Visit.query.all()
+    return render_template('statistics.html', visits=visits)
+
+if __name__ == '__main__':
+    app.run(debug=True)
