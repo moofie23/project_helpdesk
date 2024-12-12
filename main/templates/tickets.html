@@ -1,0 +1,102 @@
+<title>Заявка</title>
+{% extends 'main.html' %}
+{% block container %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+</head>
+<header>
+    <div class='container-nav'>
+        <nav class="navbar bg-body-dark">
+            <div class="container-fluid">
+            <a class="navbar-brand" href="main">
+                <img src="static/zerotwoglass.gif" alt="Logo" width="50" height="42" class="d-inline-block align-text-top">
+            </a>
+            {% if session.get('auth_id') %}
+                    <div class="dropdown">
+                        <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton" aria-expanded="false">
+                            {{ session.get('username') }}
+                        </button>
+                    <!-- Выпадающее меню -->
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="/profile">Профиль</a>
+                            <a class="dropdown-item" href="/profile-settings">Настройки</a>
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">Выйти</a>
+                        </div>
+                    </div>
+                    {% else %}
+                        <!-- Если пользователь не авторизован, показываем кнопку авторизации -->
+                        <a class="btn-23" href="auth">
+                            <span class="text">Авторизация</span>
+                            <span aria-hidden="" class="marquee">Auth</span>
+                        </a>
+                    {% endif %}
+            </div>
+        </nav>
+    </div>
+</header>
+<main>
+    <hr class="hr-nav">
+    <div class="container-mt-5">
+        <a href="main" class="btn btn-dark">
+            <img src="static/main.svg" width="30" height="35">
+        </a>
+        <span>Главная</span>
+      </div>
+    <div class="container-mt-5">
+        <a href="request" class="btn btn-dark">
+            <img src="static/help.svg" width="30" height="35">
+        </a>
+        <span>Поддержка</span>
+      </div>
+    <div class="container-mt-5">
+        <a href="tickets" class="btn btn-dark">
+          <img src="static/ticket.svg" width="30" height="35">
+        </a>
+        <span>Тикет</span>
+      </div>
+        <div class="container">
+            <h1 class="mt-4">Список заявок</h1>
+            <div class="table-container">  <!-- Added a container for the table -->
+              <table class="table table-bordered mt-3 table-dark table-striped" id="myTable">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Имя</th>
+                      <th>Электронная почта</th>
+                      <th>Тема</th>
+                      <th>Тип</th>
+                      <th>Дата создания</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for ticket in tickets %}
+                        <tr>
+                            <td>{{ ticket.id }}</td>
+                            <td>{{ ticket.name_client }}</td>
+                            <td>{{ ticket.email }}</td>
+                            <td>{{ ticket.subject }}</td>
+                            <td>{{ ticket.type }}</td>
+                            <td>{{ ticket.beg_date }}</td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Нет заявок</td>
+                        </tr>
+                    {% endfor %}
+                  </tbody>
+              </table>
+            </div>
+        </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js"></script>
+    <!--<div class="container-mt-4" style="margin-top: -90px"></div>
+      </div>
+      <div class="container-mt-3" style="margin-top: 0px;"></div>-->
+</main>
+<script>
+    $(document).ready( function () {
+        $('#myTable').DataTable();
+    } );
+    </script>
+{% endblock %}
