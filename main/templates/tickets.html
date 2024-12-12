@@ -1,0 +1,213 @@
+<title>Заявка</title>
+{% extends 'main.html' %}
+{% block container %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+</head>
+<header>
+    <div class='container-nav'>
+        <nav class="navbar bg-body-dark">
+            <div class="container-fluid">
+            <a class="navbar-brand" href="main">
+                <img src="static/zerotwoglass.gif" alt="Logo" width="50" height="42" class="d-inline-block align-text-top">
+            </a>
+            {% if session.get('auth_id') %}
+                    <div class="dropdown">
+                        <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton" aria-expanded="false">
+                            {{ session.get('username') }}
+                        </button>
+                    <!-- Выпадающее меню -->
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="/profile">Профиль</a>
+                            <a class="dropdown-item" href="/profile-settings">Настройки</a>
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">Выйти</a>
+                        </div>
+                    </div>
+                    {% else %}
+                        <!-- Если пользователь не авторизован, показываем кнопку авторизации -->
+                        <a class="btn-23" href="auth">
+                            <span class="text">Авторизация</span>
+                            <span aria-hidden="" class="marquee">Auth</span>
+                        </a>
+                    {% endif %}
+            </div>
+        </nav>
+    </div>
+</header>
+<main>
+    <hr class="hr-nav">
+    <div class="container-mt-5">
+        <a href="main" class="btn btn-dark">
+            <img src="static/main.svg" width="30" height="35">
+        </a>
+        <span>Главная</span>
+      </div>
+    <div class="container-mt-5">
+        <a href="request" class="btn btn-dark">
+            <img src="static/help.svg" width="30" height="35">
+        </a>
+        <span>Поддержка</span>
+      </div>
+    <div class="container-mt-5">
+        <a href="tickets" class="btn btn-dark">
+          <img src="static/ticket.svg" width="30" height="35">
+        </a>
+        <span>Тикет</span>
+      </div>
+
+    <div class="container">
+        <h1 class="mt-4">Список заявок</h1>
+        <div class="table-container mt-5">
+            <table class="table table-bordered mt-3 table-dark table-striped" id="myTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Электронная почта</th>
+                        <th>Тема</th>
+                        <th>Тип</th>
+                        <th>Дата создания</th>
+                        <th>Статус</th>  
+                        <th>Действия</th> 
+                    </tr>
+                </thead>
+                <!-- Существующий код, где выводится информация о заявках -->
+                    <tbody>
+                        {% for ticket in tickets %}
+                            <tr>
+                                <td>{{ ticket.id }}</td>
+                                <td>{{ ticket.name_client }}</td>
+                                <td>{{ ticket.email }}</td>
+                                <td>{{ ticket.subject }}</td>
+                                <td>{{ ticket.type }}</td>
+                                <td>{{ ticket.beg_date }}</td>
+                                <td class="text-center">
+                                    <!-- Показываем название статуса -->
+                                    {{ ticket.status.name if ticket.status else 'Не определен' }}
+                                </td>
+                                <td class="text-center">
+                                    <a href="/ticket/{{ ticket.id }}" class="btn btn-primary btn-sm">
+                                        Перейти
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center">Нет заявок</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+
+                
+            </table>
+            
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0-alpha1/js/bootstrap.bundle.min.js"></script>
+
+    <script type="text/javascript">
+        var table = $('#myTable').DataTable({
+            responsive: true, // Адаптивность таблицы
+            paging: true, // Включаем пагинацию
+            searching: true, // Включаем поиск
+            stateSave: true, // Сохраняем состояние
+            autoWidth: false, // Отключаем автоматическую ширину столбцов
+            lengthChange: false, // Убираем возможность изменения количества отображаемых записей
+            ordering: true, // Включаем сортировку
+            scrollCollapse: true, // Прокрутка будет исчезать, если нет данных для отображения
+            scrollX: false // Убираем горизонтальную прокрутку
+        });
+    
+        // Логика для изменения цвета статуса
+        $(".circle-button").each(function() {
+            let statusId = $(this).data("color");
+            $(this).css("background-color", statusId); // Устанавливаем цвет из базы данных
+        });
+    
+        $(".circle-button").click(function() {
+            let ticketId = $(this).data("id");
+            let currentColor = $(this).data("color");
+    
+            // Массив доступных цветов
+            const colors = ['green', 'orange', 'red', 'blue', 'purple', 'yellow', 'gray'];
+            let currentIndex = colors.indexOf(currentColor);
+            let nextIndex = (currentIndex + 1) % colors.length;
+            let nextColor = colors[nextIndex];
+    
+            // Обновляем цвет кнопки
+            $(this).css("background-color", nextColor);
+            $(this).data("color", nextColor);
+    
+            // Отправляем запрос на сервер для обновления
+            $.ajax({
+                url: "/update_ticket_status",  // URL для обработки запроса
+                method: "POST",
+                data: {
+                    ticket_id: ticketId,
+                    status_id: nextColor
+                },
+                success: function(response) {
+                    console.log("Статус успешно обновлен.");
+                    table.ajax.reload();  // Перезагружаем данные таблицы
+                },
+                error: function(error) {
+                    console.log("Ошибка при обновлении статуса.");
+                }
+            });
+        });
+    </script>
+    
+    
+    
+    <style>
+        /* Стиль для кнопок-кругов */
+        .circle-button {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: none;
+            display: inline-block;
+            cursor: pointer;
+            background-color: gray; /* Стартовый цвет */
+            margin: 0 auto;
+            display: block;
+        }
+
+        /* Центрируем ячейку в колонке "Статус" */
+        td.text-center {
+            text-align: center;
+        }
+
+        /* Стиль кнопки "Перейти" */
+        .btn-sm {
+            padding: 5px 10px;
+        }
+        /* Стиль для кнопок с разными статусами */
+        .circle-button[data-color="green"] {
+            background-color: green;
+        }
+        .circle-button[data-color="orange"] {
+            background-color: orange;
+        }
+        .circle-button[data-color="red"] {
+            background-color: red;
+        }
+        .circle-button[data-color="blue"] {
+            background-color: blue;
+        }
+        .circle-button[data-color="purple"] {
+            background-color: purple;
+        }
+        .circle-button[data-color="yellow"] {
+            background-color: yellow;
+        }
+        .circle-button[data-color="gray"] {
+            background-color: gray;
+        }
+
+    </style>
+
+</main>
+{% endblock %}

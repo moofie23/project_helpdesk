@@ -1,0 +1,89 @@
+<title>Заявка</title>
+{% extends 'main.html' %}
+{% block container %}
+<header>
+    <div class='container-nav'>
+        <nav class="navbar bg-body-dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="main">
+                    <img src="static/zerotwoglass.gif" alt="Logo" width="50" height="42" class="d-inline-block align-text-top">
+                </a>
+                {% if session.get('auth_id') %}
+                    <div class="dropdown">
+                        <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton" aria-expanded="false">
+                            {{ session.get('username') }}
+                        </button>
+                        <!-- Выпадающее меню -->
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="/profile">Profile</a>
+                            <a class="dropdown-item" href="/profile-settings">Settings</a>
+                            <a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a class="btn-23" href="auth">
+                        <span class="text">Авторизация</span>
+                        <span aria-hidden="" class="marquee">Auth</span>
+                    </a>
+                {% endif %}
+            </div>
+        </nav>
+    </div>
+</header>
+<main>
+    <hr class="hr-nav">
+    <div class="container-mt-5">
+        <a href="main" class="btn btn-dark">
+            <img src="static/main.svg" width="30" height="35">
+        </a>
+        <span>Главная</span>
+    </div>
+    <div class="container-mt-5">
+        <a href="request" class="btn btn-dark">
+            <img src="static/help.svg" width="30" height="35">
+        </a>
+        <span>Поддержка</span>
+    </div>
+    <div class="container-mt-5">
+        <a href="tickets" class="btn btn-dark">
+            <img src="static/ticket.svg" width="30" height="35">
+        </a>
+        <span>Тикет</span>
+    </div>
+    <div class="container-mt-4">
+        <button class="btn btn-dark" style="margin: 15px; color: #C72A71;">Проблема</button>
+    </div>
+
+    <!-- Форма отправки заявки -->
+    <form method="POST" action="{{ url_for('request_page') }}">
+        <div class="container-mt-3">
+            <div class="input-start-block">
+                <input class="input-label" type="text" class="form-control" name="name_client" id="name" placeholder="Имя" required>
+                <label class="name-label">Ваше имя:</label>
+                
+                <input class="input-label" type="email" class="form-control" name="email" id="email" placeholder="Email" required>
+                <label class="name-label">Ваш Email:</label>
+                
+                <input class="input-label" type="text" class="form-control" name="subject" id="subject" placeholder="Тема" required>
+                <label class="name-label">Тема заявки:</label>
+                
+                <textarea class="textarea-label" name="description" id="description" placeholder="Проблема" required></textarea>
+                <label class="text-label">Ваша проблема:</label>
+                
+                <select class="input-label" name="type" required>
+                    <option selected>Тип</option>
+                    <option value="Проблема">Проблема</option>
+                    <option value="Ошибка">Ошибка</option>
+                </select>
+                <label class="name-label">Тип заявки:</label>
+            </div>
+
+            <!-- Используем flexbox для выравнивания кнопок -->
+            <div class="d-flex justify-content-between" style="margin-top: 600px;">
+                <button type="submit" class="btn btn-danger" style="width: 48%;">Отправить</button>
+                <button type="reset" class="btn btn-dark" style="width: 48%;">Очистить заявку</button>
+            </div>
+        </div>
+    </form>
+</main>
+{% endblock %}
